@@ -2,6 +2,10 @@
 # TODO: set previous directory to project file
 LOC="`dirname \"$0\"`"
 declare -a dirs
+# create projects file if not exists
+if [ ! -f ./projects ]; then
+  touch ./projects
+fi
 
 function get_from_root() {
   source $LOC/config
@@ -76,7 +80,20 @@ function get_last() {
 
 
 function gotolast() {
-  cd $1 && store_project $1
+  final=$1
+  sec=$2
+  # jump to inner directory if there was a second argument
+  if [[ $sec != 0 ]]; then
+    final=$1/$2
+  fi
+  if cd $final; then
+    store_project $1
+    echo $final
+  else
+    echo changing to $1
+    cd $1
+    echo inner directory argument was incorrect.
+  fi
 }
 
 
@@ -106,8 +123,9 @@ function show_menu() {
       loc=`grep -P "^$opt" $LOC/projects | grep -Po "\/.*"`
     fi
     # loc=`sed -e "$opt q;d" $LOC/projects | grep -Po "\/.*"`
-    cd $loc &&
-      store_project $loc &&
+    gotolast $loc ${@:2} &&
+    # cd $loc &&
+    #  store_project $loc &&
       update_last_project $name $loc
     
     break
@@ -124,8 +142,9 @@ function get_project_at() {
   do
     if [ -z $opt ]; then break; fi
     if [ $opt = 'yes' ]; then
-      cd $loc && 
-        store_project $loc &&
+      # TODO: need to add sub directory navigation
+      gotolast $loc && 
+        # store_project $loc &&
         update_last_project $head $loc
       break
     fi
@@ -149,10 +168,12 @@ if [ -z $1 ]; then
   show_menu $1
 else
   case "$1" in
-    "p") get_last $1;;
-    "a") show_menu $1;;
-    "l") gotolast `get_last`;;
-    ''|*[0-9]*) if isValidRange $1; then get_project_at $1 ; fi
+    # TODO need better argument parsing
+    "p") get_last;;
+    "a") show_menu ${@};;
+    "l") gotolast `get_last` ${@:2};;
+    ''|*[0-9]*) if isValidRange $1; then get_project_at ${@:2} ; fi
   esac
 fi
+
 
