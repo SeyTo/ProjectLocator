@@ -1,10 +1,14 @@
 #!/bin/zsh
-# TODO: set previous directory to project file
+
 LOC="`dirname \"$0\"`"
 declare -a dirs
 # create projects file if not exists
 if [ ! -f ./projects ]; then
-  touch ./projects
+  touch $LOC/projects
+fi
+
+if [ ! -f ./last ]; then
+  touch $LOC/last
 fi
 
 function get_from_root() {
@@ -161,8 +165,6 @@ function isValidRange() {
 }
 
 # for i in `seq ${#DIRS[@]}`;
-
-# todo: add option
 
 if [ -z $1 ]; then
   show_menu $1
