@@ -2,6 +2,19 @@
 
 LOC="`dirname \"$0\"`"
 declare -a dirs
+
+function usage {
+  echo "usage: ProLo(ProjectLocator) [l [dirs]] [a] [0-9]"
+  echo "  [no args]     show last 10 projects." 
+  echo "  l             goto last project you selected."
+  echo "  l dirs        goto last project's sub directory."
+  echo "  a             show all project directories."
+  echo "  0-9           goto one of the project (if you know its current project id)"
+  echo "  -h            display help"
+  exit 1
+}
+
+
 # create projects file if not exists
 if [ ! -f ./projects ]; then
   touch $LOC/projects
