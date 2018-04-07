@@ -17,3 +17,6 @@ This project uses zsh/&bash only (so far).
 TODO:
   - add custom commands to each project folders and run to get bunch of repetitive stuffs done immediately. Like, `pro prepare` in an angular app will run `ng serve`, then open that project in my fav editor and then open my documentations in vim etc.
   - read git branches and latest commits in the main menu
+  - read todo list relating to this project from `task` cli.
+    - add task cli project keyword to config and read it when navigating to project.
+    - usba(users should be able) to link project directory with task project tag.
