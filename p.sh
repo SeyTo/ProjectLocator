@@ -1,9 +1,11 @@
 #!/bin/zsh
 
 LOC="`dirname \"$0\"`"
+# collection of directories, temp collection var
 declare -a dirs
 
 function usage {
+  # shows usages
   cat<<-EOF
   Locates and changes directories to your projects and does other stuffs relating to them.
   usage: ProLo(ProjectLocator) [l [dirs]] [a] [0-9]
@@ -18,7 +20,7 @@ EOF
 }
 
 
-# create projects file if not exists
+# create projects file at script location
 if [ ! -f ./projects ]; then
   touch $LOC/projects
 fi
@@ -27,7 +29,8 @@ if [ ! -f ./last ]; then
   touch $LOC/last
 fi
 
-function get_from_root() {
+function getfromroot() {
+  # get all files at ROOT var
   source $LOC/config
   dirs=()
   LS_DIRS=`ls $ROOT`
@@ -41,7 +44,10 @@ function get_from_root() {
   done
 }
 
-function get_from_config() {
+
+function getfromconfig() {
+  # get all project directories from ./projects
+  # and read their path
   dirs=()
   CNT=1
   while read -r line
@@ -53,7 +59,9 @@ function get_from_config() {
   done < $LOC/projects
 }
 
-function output_to_file_arr() {
+
+function outputtofilearray() {
+  # deprecated
   for i in $1
   do
     echo output
@@ -63,7 +71,10 @@ function output_to_file_arr() {
 }
 
 
-function update_last_project() {
+function updatelastproject() {
+  # appends last selected project to ./projects
+  # shifts the project from bottom up
+  # pops the older projects
   if [ -z $1 ] | [ -z $2 ]; then 
     return 
   fi
@@ -85,20 +96,14 @@ function update_last_project() {
 }
 
 
-function store_project() {
+function storeproject() {
+  # save the last project location to ./last
   echo $1 > $LOC/last 
 }
 
 
-function show_last() {
-  if [ -f $LOC/last ]; then
-    cat $LOC/last
-  else
-    echo No last project found
-  fi
-}
-
 function getlastprojectpath() {
+  # get last project's path
   # TODO change last directory to contain more info
   if [ -f $LOC/last ]; then
     cat $LOC/last 
@@ -109,7 +114,9 @@ function getlastprojectpath() {
 
 
 function getlastprojectname() {
-  local last_path=`getlastprojectpath`
+  # get last project's name from actual path format.
+  last_path=`getlastprojectpath`
+
   if [[ $last_path != '' ]]; then
     echo $last_path | sed 's/.*\///'
   else
@@ -119,6 +126,7 @@ function getlastprojectname() {
 
 
 function gotolast() {
+  # change directory to latest project.
   final=$1
   sec=$2
   # jump to inner directory if there was a second argument
@@ -126,22 +134,23 @@ function gotolast() {
     final=$1/$2
   fi
   if cd $final; then
-    store_project $1
-    echo $final
+    storeproject $1
+    echo cd to: $final
   else
-    echo changing to $1
+    echo cd to: $1
     cd $1
     echo inner directory argument was incorrect.
   fi
 }
 
 
-function show_menu() {
+function showmenu() {
+  # show list of all directories in $ROOT dir
   if [[ $1 == 'a' ]]
   then
-    get_from_root 
+    getfromroot 
   else
-    get_from_config
+    getfromconfig
   fi
 
   # select a project
@@ -164,27 +173,29 @@ function show_menu() {
     # loc=`sed -e "$opt q;d" $LOC/projects | grep -Po "\/.*"`
     gotolast $loc ${@:2} &&
     # cd $loc &&
-    #  store_project $loc &&
-      update_last_project $name $loc
+    #  storeproject $loc &&
+      updatelastproject $name $loc
     
     break
   done
 }
 
 
-function get_project_at() {
+function getprojectat() {
+  # gets project at set location (from ./project)
   file=`sed "$1 q;d" $LOC/projects`
   head=`echo $file | grep -Po ".*=" | sed 's/.$//'`
   loc=`echo $file | grep -Po "\/.*"`
   echo $head : $loc 
+  # select yes no before confirming cd
   select opt in yes no 
   do
     if [ -z $opt ]; then break; fi
     if [ $opt = 'yes' ]; then
       # TODO: need to add sub directory navigation
       gotolast $loc && 
-        # store_project $loc &&
-        update_last_project $head $loc
+        # storeproject $loc &&
+        updatelastproject $head $loc
       break
     fi
     break
@@ -192,7 +203,8 @@ function get_project_at() {
 }
 
 
-function isValidRange() {
+function isvalidrange() {
+  # check if given number lies within range of ./project 's list
   # TODO get range from the file
   if [ $1 -lt 10 ]; then
     return 0
@@ -200,7 +212,10 @@ function isValidRange() {
   return 1
 }
 
+
 function opentasklist() {
+  # opens task list for the lastest project
+  # TODO get task list for project at given number
   last_project=`getlastprojectname`
   if [ -z "$last_project" ]; then
     echo no last project found. Ps Open a project first. 
@@ -213,6 +228,8 @@ function opentasklist() {
 
 # for i in `seq ${#DIRS[@]}`;
 
+# START
+
 # start parsing args
 while [ "$1" != "" ]; do
   PARAM=`echo $1 | awk -F= '{print $1}'`
@@ -220,30 +237,24 @@ while [ "$1" != "" ]; do
   case $PARAM in
     -h | --help)
       usage
-      exit
       ;;
     p)
-      show_last
-      exit
+      getlastprojectname
       ;;
     a)
-      show_menu ${@}
-      exit
+      showmenu ${@}
       ;;
     l)
-      gotolast `show_last` ${@:2}
-      exit
+      gotolast `getlastprojectpath` ${@:2}
       ;;
     *[0-9]*)
-      if isValidRange $1; then get_project_at ${@:2}; fi
-      exit
+      if isvalidrange $1; then getprojectat ${@:2}; fi
       ;;
     ta)
       if [ -n `task --version` ]; then
         opentasklist `getlastprojectname`
       else
         echo Ps install task using \`sudo pacman install task\`
-        exit
       fi
       ;;
     *)
