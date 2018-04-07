@@ -1,3 +1,0 @@
-[submodule "modules/bash-argmument-parser"]
-	path = modules/bash-argmument-parser
-	url = https://github.com/moebrowne/bash-argument-parser.git

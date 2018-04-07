@@ -1,17 +1,21 @@
 #!/bin/zsh
+# TODO task cli integration
 
 LOC="`dirname \"$0\"`"
 declare -a dirs
 
 function usage {
-  echo "usage: ProLo(ProjectLocator) [l [dirs]] [a] [0-9]"
-  echo "  [no args]     show last 10 projects." 
-  echo "  l             goto last project you selected."
-  echo "  l dirs        goto last project's sub directory."
-  echo "  a             show all project directories."
-  echo "  0-9           goto one of the project (if you know its current project id)"
-  echo "  -h            display help"
-  exit 1
+  cat<<-EOF
+  Locates and changes directories to your projects and does other stuffs relating to them.
+  usage: ProLo(ProjectLocator) [l [dirs]] [a] [0-9]
+    [no args]     show last 10 projects.
+    l             goto last project you selected.
+    l dirs        goto last project's sub directory.
+    a             show all project directories.
+    0-9           goto one of the project (if you know its current project id)
+    -h            display help
+EOF
+  return;
 }
 
 
@@ -171,24 +175,50 @@ function get_project_at() {
 
 
 function isValidRange() {
+  # TODO get range from the file
   if [ $1 -lt 10 ]; then
     return 0
   fi
   return 1
 }
 
+
+
 # for i in `seq ${#DIRS[@]}`;
 
-if [ -z $1 ]; then
-  show_menu $1
-else
-  case "$1" in
-    # TODO need better argument parsing
-    "p") get_last;;
-    "a") show_menu ${@};;
-    "l") gotolast `get_last` ${@:2};;
-    ''|*[0-9]*) if isValidRange $1; then get_project_at ${@:2} ; fi
+# start parsing args
+while [ "$1" != "" ]; do
+  PARAM=`echo $1 | awk -F= '{print $1}'`
+  VALUE=`echo $1 | awk -F= '{print $2}'`
+  case $PARAM in
+    -h | --help)
+      usage
+      exit
+      ;;
+    p)
+      get_last
+      exit
+      ;;
+    a)
+      show_menu ${@}
+      exit
+      ;;
+    l)
+      gotolast `get_last` ${@:2}
+      exit
+      ;;
+    *[0-9]*)
+      if isValidRange $1; then get_project_at ${@:2}; fi
+      exit
+      ;;
+    t)
+      ;;
+    *)
+      echo "ERROR: unknown parameter \"$PARAM\""
+      usage
+      exit 1
+      ;;
   esac
-fi
-
+  shift
+done
 
