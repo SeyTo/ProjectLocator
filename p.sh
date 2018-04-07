@@ -1,5 +1,4 @@
 #!/bin/zsh
-# TODO task cli integration
 
 LOC="`dirname \"$0\"`"
 declare -a dirs
@@ -91,11 +90,30 @@ function store_project() {
 }
 
 
-function get_last() {
+function show_last() {
   if [ -f $LOC/last ]; then
     cat $LOC/last
   else
     echo No last project found
+  fi
+}
+
+function getlastprojectpath() {
+  # TODO change last directory to contain more info
+  if [ -f $LOC/last ]; then
+    cat $LOC/last 
+  else
+    echo ''
+  fi
+}
+
+
+function getlastprojectname() {
+  local last_path=`getlastprojectpath`
+  if [[ $last_path != '' ]]; then
+    echo $last_path | sed 's/.*\///'
+  else
+    echo ''
   fi
 }
 
@@ -182,7 +200,16 @@ function isValidRange() {
   return 1
 }
 
-
+function opentasklist() {
+  last_project=`getlastprojectname`
+  if [ -z "$last_project" ]; then
+    echo no last project found. Ps Open a project first. 
+  else
+    echo lastest project: $last_project
+    echo task list for $last_project
+    task project:$last_project
+  fi
+}
 
 # for i in `seq ${#DIRS[@]}`;
 
@@ -196,7 +223,7 @@ while [ "$1" != "" ]; do
       exit
       ;;
     p)
-      get_last
+      show_last
       exit
       ;;
     a)
@@ -204,14 +231,20 @@ while [ "$1" != "" ]; do
       exit
       ;;
     l)
-      gotolast `get_last` ${@:2}
+      gotolast `show_last` ${@:2}
       exit
       ;;
     *[0-9]*)
       if isValidRange $1; then get_project_at ${@:2}; fi
       exit
       ;;
-    t)
+    ta)
+      if [ -n `task --version` ]; then
+        opentasklist `getlastprojectname`
+      else
+        echo Ps install task using \`sudo pacman install task\`
+        exit
+      fi
       ;;
     *)
       echo "ERROR: unknown parameter \"$PARAM\""
