@@ -83,6 +83,7 @@ function updatelastproject() {
     return
   fi
 
+  # append string to ./projects
   len=(`wc -l $LOC/projects`)
   if [ $len[1] -gt 10 ]; then
     temp=(`tail -n 9 $LOC/projects`)
@@ -137,6 +138,8 @@ function gotolast() {
     storeproject $1
     echo cd to: $final
   else
+    echo could find here
+    sleep 1
     echo cd to: $1
     cd $1
     echo inner directory argument was incorrect.
@@ -231,6 +234,11 @@ function opentasklist() {
 # START
 
 # start parsing args
+if [ "$1" = "" ]; then
+  showmenu
+  return
+fi
+
 while [ "$1" != "" ]; do
   PARAM=`echo $1 | awk -F= '{print $1}'`
   VALUE=`echo $1 | awk -F= '{print $2}'`
@@ -246,6 +254,8 @@ while [ "$1" != "" ]; do
       ;;
     l)
       gotolast `getlastprojectpath` ${@:2}
+      # FIXME: hectic exit, removing return will cause exit,??no idea why
+      return
       ;;
     *[0-9]*)
       if isvalidrange $1; then getprojectat ${@:2}; fi
