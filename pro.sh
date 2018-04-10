@@ -229,6 +229,56 @@ function opentasklist() {
   fi
 }
 
+function copyfilesfromtemplatedir() {
+  # create a copy of templates from templates dirs
+  source $LOC/config
+  echo 'Project Name?'
+  local projectname
+  read -r projectname
+  echo project location: $ROOT/$projectname
+  echo template location: $LOC/templates/$1 
+  # cp -r $LOC/templates/$1/ $2
+}
+
+IN_SUB_DIR=false
+TEMPLATE_DIR=''
+function showcreateprojectmenu() {
+  # show list of all directories in template dir
+  local dirs=()
+  local templatedir=$1
+  local CNT=1
+  for dir in `ls $templatedir`
+  do
+    dirs[$CNT]="$dir"
+    # echo $dir
+    CNT=`expr $CNT + 1`
+  done
+
+  echo $dirs[@]
+
+  # select a project
+  PS3='index? '
+  select opt in "${dirs[@]}"
+  do
+    # get the option out of the string, todo: volatile
+    if [ -z $opt ]; then
+      break
+    fi
+
+    echo $opt
+    if [ $IN_SUB_DIR = false ]; then
+      IN_SUB_DIR=true
+      TEMPLATE_DIR=$opt
+      showcreateprojectmenu $LOC/templates/$opt
+    else
+      TEMPLATE_DIR=$TEMPLATE_DIR/$opt
+      copyfilesfromtemplatedir $TEMPLATE_DIR
+    fi
+    
+    break
+  done
+}
+
 # for i in `seq ${#DIRS[@]}`;
 
 # START
@@ -238,6 +288,7 @@ if [ "$1" = "" ]; then
   showmenu
   return
 fi
+
 
 while [ "$1" != "" ]; do
   PARAM=`echo $1 | awk -F= '{print $1}'`
@@ -266,6 +317,9 @@ while [ "$1" != "" ]; do
       else
         echo Ps install task using \`sudo pacman install task\`
       fi
+      ;;
+    create)
+      showcreateprojectmenu $LOC/templates
       ;;
     *)
       echo "ERROR: unknown parameter \"$PARAM\""

@@ -1,6 +1,6 @@
 # ProjectLocator (ProLo)
 
-Sick and tired of having to type project's location everytime I want to work on them. Basically, Project Locator will simply show a list of projects you have in config's ROOT property and navigate into them quickly. I tried to make the commands as short as possible.
+Sick and tired of having to type project's location everytime I want to work on them. Basically, Project Locator will simply show a list of projects you have in config's ROOT property and navigate into them quickly. ProLo will never try to modify anything in your project folder. Well I tried to make the commands as short as possible.
 
 This project uses zsh/&bash only (so far).
 
@@ -34,8 +34,20 @@ You will need to alias the script to run the script as 'pro'.
 ```
 #### TODO:
 
+  - Let ProLo create a new project with specified template.
+    - Custom todo reader at a specified location.
+  - Lets ProLo know that there are main sub folders that contain generic information which should be navigated quickly.
+    e.g. I use this structure for every project folder.
+          myproject -+- docs (contains all documentations and architecture information for development)
+                     +- devs (contains information about development, like scrum, agile stages etc)
+                     +- srcs (the main srcs containing all sort of source codes)
+
+                     + docs -> arch, design, reqs ...
+                     + devs -> elicitations, reqs, stages, todos.md ...
+                     + srcs -> myproject(android), myproject.b(api), myproject(configs) ...
   - add custom commands to each project folders and run to get bunch of repetitive stuffs done immediately. Like, `pro prepare` in an angular app will run `ng serve`, then open that project in my fav editor and then open my documentations in vim etc.
-  - Read git branches and oldest commits in the main menu.
+  - Git related features
+    - Read git branches and latest commits in the main menu.
   - Linking with `task` cli.
     - usba(users should be able) to link project directory with task project tag.
     - a universal variable like `$pro` to let the users do this `task project:$pro I wan to do this`, always on when in the latest directory.
