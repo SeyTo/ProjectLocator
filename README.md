@@ -51,3 +51,4 @@ You will need to alias the script to run the script as 'pro'.
   - Linking with `task` cli.
     - usba(users should be able) to link project directory with task project tag.
     - a universal variable like `$pro` to let the users do this `task project:$pro I wan to do this`, always on when in the latest directory.
+  - New command to execute everything in another shell program related to current project.
