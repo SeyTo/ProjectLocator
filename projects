@@ -1,5 +1,3 @@
-mygame=/a/_proj/mygame
-physical=/a/_proj/physical
 joblogger=/a/_proj/joblogger
 xplore=/a/_proj/xplore
 startup.a=/a/_proj/startup.a
@@ -9,3 +7,4 @@ supermanager=/a/_proj/supermanager
 a.joblogger=/a/_proj/a.joblogger
 and.customviews=/a/_proj/and.customviews
 tales=/a/_proj/tales
+portfolio=/a/_proj/portfolio

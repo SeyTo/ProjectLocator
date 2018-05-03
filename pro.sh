@@ -6,15 +6,18 @@ declare -a dirs
 
 function usage {
   # shows usages
+  # TODO dirs should have directory autocompletion
   cat<<-EOF
   Locates and changes directories to your projects and does other stuffs relating to them.
   usage: ProLo(ProjectLocator) [l [dirs]] [a] [0-9]
     [no args]     show last 10 projects.
     l             goto last project you selected.
+    l-s           shows a list of scripts you can run for the project.
     l dirs        goto last project's sub directory.
     a             show all project directories.
     0-9           goto one of the project (if you know its current project id)
     -h            display help
+    i             initialize a script. Helps you to start windows and other stuffs that otherwise isn't available in ProLo.
 EOF
   return;
 }
@@ -279,6 +282,55 @@ function showcreateprojectmenu() {
   done
 }
 
+showscriptlists() {
+  local dirarr=()
+  local dirname=()
+  local filename=()
+  local count=1
+  dirs=`ls $LOC/scripts`
+  for i in $dirs
+  do
+    echo $LOC/scripts/$i
+    local testDir=$LOC/scripts/$i
+    if [ -d "$testDir" ]; then
+      # check if has s* sh files
+      dirarr[$count]=$i
+      dirname[$count]=$i
+
+      local testShFiles=`ls $testDir`
+
+      local testContains
+      # check if atleast one file exists
+      for sh in $testShFiles
+      do 
+        testContains=true
+        break
+      done
+
+      if [ $testContains = true ]; then
+        localfilename=()
+        for sh in $testShFiles
+        do 
+          local testShFile=$LOC/scripts/$i/$sh
+          if [ -f $testShFile ]; then
+            echo final
+            echo $testShFile $dirname[$count] 
+            echo desc
+            head -n 1 $LOC/scripts/$i/$sh
+          fi
+        done
+      fi
+
+      # save sh files in the script/$i dir
+
+      count=`expr $count + 1`
+    fi
+  done
+
+  echo dir array
+  echo $dirarr[@]
+}
+
 # for i in `seq ${#DIRS[@]}`;
 
 # START
@@ -308,6 +360,9 @@ while [ "$1" != "" ]; do
       # FIXME: hectic exit, removing return will cause exit,??no idea why
       return
       ;;
+    l-s)
+      showscriptlists `getlastprojectpath` `getlastprojectname` 
+      ;;
     *[0-9]*)
       if isvalidrange $1; then getprojectat ${@:2}; fi
       ;;
@@ -321,10 +376,14 @@ while [ "$1" != "" ]; do
     create)
       showcreateprojectmenu $LOC/templates
       ;;
+    i)
+      # initialize using a script for the current project
+      # find if init file has been created, else create in ./init/projectname.sh
+      # source the script
+      ;;
     *)
       echo "ERROR: unknown parameter \"$PARAM\""
       usage
-      exit 1
       ;;
   esac
   shift

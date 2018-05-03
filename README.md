@@ -52,3 +52,4 @@ You will need to alias the script to run the script as 'pro'.
     - usba(users should be able) to link project directory with task project tag.
     - a universal variable like `$pro` to let the users do this `task project:$pro I wan to do this`, always on when in the latest directory.
   - New command to execute everything in another shell program related to current project.
+  - New config commands specific to each project folder. `pro l ?` will show list of command specific to current project. `pro l s` will change to directory 'srcs' in that project location. 
