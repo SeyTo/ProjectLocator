@@ -282,6 +282,42 @@ function showcreateprojectmenu() {
   done
 }
 
+showscriptlists2() {
+  local dirs=()
+  local scriptdir=$1
+  local CNT=1
+
+  for dir in `ls $scriptdir`
+  do
+    dirs[$CNT]="$dir"
+    # echo $dir
+    CNT=`expr $CNT + 1`
+  done  
+  PS3='index?'
+
+  select opt in "${dirs[@]}"
+  do
+    if [ -z $scriptdir/$opt ]; then; break; fi;
+    echo OPT $opt
+    echo coutn $CNT
+    echo 
+
+    if [ -d $scriptdir/$opt ]; then
+      echo is dir
+      showscriptlists2 $1/$opt
+      break
+    elif [ -f $scriptdir/$opt ]; then
+      echo is file
+      exec $scriptdir/$opt
+      break
+    else
+      echo is nothing
+      break
+    fi
+  done
+
+}
+
 showscriptlists() {
   local dirarr=()
   local dirname=()
@@ -309,16 +345,20 @@ showscriptlists() {
 
       if [ $testContains = true ]; then
         localfilename=()
+        fileCount=1
         for sh in $testShFiles
         do 
           local testShFile=$LOC/scripts/$i/$sh
           if [ -f $testShFile ]; then
             echo final
-            echo $testShFile $dirname[$count] 
-            echo desc
-            head -n 1 $LOC/scripts/$i/$sh
+            localfilename[$fileCount]=$testShFile
+            echo $testShFile $dirname[$count]
+            # echo desc
+            # head -n 1 $LOC/scripts/$i/$sh
+            fileCount=`expr $fileCount + 1`
           fi
         done
+        filename[$count]=$localfilename
       fi
 
       # save sh files in the script/$i dir
@@ -361,7 +401,7 @@ while [ "$1" != "" ]; do
       return
       ;;
     l-s)
-      showscriptlists `getlastprojectpath` `getlastprojectname` 
+      showscriptlists2 $LOC/scripts
       ;;
     *[0-9]*)
       if isvalidrange $1; then getprojectat ${@:2}; fi
