@@ -282,94 +282,37 @@ function showcreateprojectmenu() {
   done
 }
 
-showscriptlists2() {
-  local dirs=()
-  local scriptdir=$1
-  local CNT=1
-
-  for dir in `ls $scriptdir`
-  do
-    dirs[$CNT]="$dir"
-    # echo $dir
-    CNT=`expr $CNT + 1`
-  done  
-  PS3='index?'
-
-  select opt in "${dirs[@]}"
-  do
-    if [ -z $scriptdir/$opt ]; then; break; fi;
-    echo OPT $opt
-    echo coutn $CNT
-    echo 
-
-    if [ -d $scriptdir/$opt ]; then
-      echo is dir
-      showscriptlists2 $1/$opt
-      break
-    elif [ -f $scriptdir/$opt ]; then
-      echo is file
-      exec $scriptdir/$opt
-      break
-    else
-      echo is nothing
-      break
-    fi
-  done
-
-}
-
 showscriptlists() {
-  local dirarr=()
-  local dirname=()
-  local filename=()
-  local count=1
-  dirs=`ls $LOC/scripts`
+  local scriptdir=$1
+  local dirs=( $(ls $scriptdir) )
+
+  local latest=`getlastprojectname`
   for i in $dirs
   do
-    echo $LOC/scripts/$i
-    local testDir=$LOC/scripts/$i
-    if [ -d "$testDir" ]; then
-      # check if has s* sh files
-      dirarr[$count]=$i
-      dirname[$count]=$i
-
-      local testShFiles=`ls $testDir`
-
-      local testContains
-      # check if atleast one file exists
-      for sh in $testShFiles
-      do 
-        testContains=true
-        break
+    # lastprojectname is same name as found script dir then
+    if [ $i = $latest ]; then
+      echo found
+      PS3='index?'
+      select opt in `ls $scriptdir/$i`
+      do
+        if [ -z $scriptdir/$opt ]; then; 
+          break
+        # ignore directories for now
+        # elif [ -d $scriptdir/$opt ]; then
+        #   showscriptlists $1/$opt
+        #   break
+        elif [ -f $scriptdir/$opt ]; then
+          exec $scriptdir/$opt
+          break
+        else
+          break
+        fi
       done
-
-      if [ $testContains = true ]; then
-        localfilename=()
-        fileCount=1
-        for sh in $testShFiles
-        do 
-          local testShFile=$LOC/scripts/$i/$sh
-          if [ -f $testShFile ]; then
-            echo final
-            localfilename[$fileCount]=$testShFile
-            echo $testShFile $dirname[$count]
-            # echo desc
-            # head -n 1 $LOC/scripts/$i/$sh
-            fileCount=`expr $fileCount + 1`
-          fi
-        done
-        filename[$count]=$localfilename
-      fi
-
-      # save sh files in the script/$i dir
-
-      count=`expr $count + 1`
+      return
     fi
   done
-
-  echo dir array
-  echo $dirarr[@]
 }
+
 
 # for i in `seq ${#DIRS[@]}`;
 
@@ -401,7 +344,7 @@ while [ "$1" != "" ]; do
       return
       ;;
     ls)
-      showscriptlists2 $LOC/scripts
+      showscriptlists $LOC/scripts
       ;;
     *[0-9]*)
       if isvalidrange $1; then getprojectat ${@:2}; fi
