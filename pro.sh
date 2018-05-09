@@ -12,7 +12,7 @@ function usage {
   usage: ProLo(ProjectLocator) [l [dirs]] [a] [0-9]
     [no args]     show last 10 projects.
     l             goto last project you selected.
-    l-s           shows a list of scripts you can run for the project.
+    ls           shows a list of scripts you can run for the project.
     l dirs        goto last project's sub directory.
     a             show all project directories.
     0-9           goto one of the project (if you know its current project id)
@@ -400,7 +400,7 @@ while [ "$1" != "" ]; do
       # FIXME: hectic exit, removing return will cause exit,??no idea why
       return
       ;;
-    l-s)
+    ls)
       showscriptlists2 $LOC/scripts
       ;;
     *[0-9]*)
