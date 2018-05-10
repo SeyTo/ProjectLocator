@@ -295,16 +295,21 @@ showscriptlists() {
       PS3='index?'
       select opt in `ls $scriptdir/$i`
       do
+        echo seeign
+        echo $scriptdir/$i/$opt
         if [ -z $scriptdir/$opt ]; then; 
           break
         # ignore directories for now
         # elif [ -d $scriptdir/$opt ]; then
         #   showscriptlists $1/$opt
         #   break
-        elif [ -f $scriptdir/$opt ]; then
-          exec $scriptdir/$opt
+        elif [ -f $scriptdir/$i/$opt ]; then
+          echo doing
+          echo $scriptdir/$i/$opt
+          exec $scriptdir/$i/$opt
           break
         else
+          echo nothing
           break
         fi
       done
