@@ -18,6 +18,8 @@ function usage {
     0-9           goto one of the project (if you know its current project id)
     -h            display help
     i             initialize a script. Helps you to start windows and other stuffs that otherwise isn't available in ProLo.
+    ta            (if you have 'task' installed). Shows list of task related to it. The project name must be set to directory name.
+    ta [tag]      (if you have 'task' installed). Shows list of task related to current project and tags(dont add '+' infront of tags). The project name must be set to directory name.
 EOF
   return;
 }
@@ -120,7 +122,7 @@ function getlastprojectpath() {
 function getlastprojectname() {
   # get last project's name from actual path format.
   last_path=`getlastprojectpath`
-
+  
   if [[ $last_path != '' ]]; then
     echo $last_path | sed 's/.*\///'
   else
@@ -228,7 +230,8 @@ function opentasklist() {
   else
     echo lastest project: $last_project
     echo task list for $last_project
-    task project:$last_project
+    # TODO process multiple tags coming from $2
+    task project:$last_project +$2
   fi
 }
 
@@ -282,6 +285,7 @@ function showcreateprojectmenu() {
   done
 }
 
+# shows list of script relating to that project and runs it if user chooses.
 showscriptlists() {
   local scriptdir=$1
   local dirs=( $(ls $scriptdir) )
@@ -295,7 +299,7 @@ showscriptlists() {
       PS3='index?'
       select opt in `ls $scriptdir/$i`
       do
-        echo seeign
+        echo seeing in 
         echo $scriptdir/$i/$opt
         if [ -z $scriptdir/$opt ]; then; 
           break
@@ -306,7 +310,7 @@ showscriptlists() {
         elif [ -f $scriptdir/$i/$opt ]; then
           echo doing
           echo $scriptdir/$i/$opt
-          exec $scriptdir/$i/$opt
+          exec $scriptdir/$i/$opt &
           break
         else
           echo nothing
@@ -356,9 +360,10 @@ while [ "$1" != "" ]; do
       ;;
     ta)
       if [ -n `task --version` ]; then
-        opentasklist `getlastprojectname`
+        opentasklist `getlastprojectname` ${@:2}
+        return
       else
-        echo Ps install task using \`sudo pacman install task\`
+        echo Ps install `task` using \`sudo pacman -S task\` for this feature to work.
       fi
       ;;
     create)

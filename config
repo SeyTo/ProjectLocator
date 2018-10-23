@@ -1,1 +1,1 @@
-ROOT=/a/_proj
+ROOT=$PROJECTROOT

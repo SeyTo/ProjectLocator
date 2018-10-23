@@ -31,9 +31,11 @@ You will need to alias the script to run the script as 'pro'.
  $ pro [0-9] srcs (same as above, but also change to 'srcs' directory.)
  $ pro l srcs     (goto last project's 'srcs' directory.)
  $ pro ta         (shows latest project's tasks - depends on `task` program )
+ $ pro ta tag     (runs the above command but with tag, using task's tag system.)
 ```
 #### TODO:
 
+  - migrate non-directory changes to python
   - Let ProLo create a new project with specified template.
     - Custom todo reader at a specified location.
   - Lets ProLo know that there are main sub folders that contain generic information which should be navigated quickly.
@@ -46,6 +48,7 @@ You will need to alias the script to run the script as 'pro'.
                      + devs -> elicitations, reqs, stages, todos.md ...
                      + srcs -> myproject(android), myproject.b(api), myproject(configs) ...
   - add custom commands to each project folders and run to get bunch of repetitive stuffs done immediately. Like, `pro prepare` in an angular app will run `ng serve`, then open that project in my fav editor and then open my documentations in vim etc.
+    - directly edit/create script files.
   - Git related features
     - Read git branches and latest commits in the main menu.
   - Linking with `task` cli.
@@ -53,3 +56,6 @@ You will need to alias the script to run the script as 'pro'.
     - a universal variable like `$pro` to let the users do this `task project:$pro I wan to do this`, always on when in the latest directory.
   - New command to execute everything in another shell program related to current project.
   - New config commands specific to each project folder. `pro l ?` will show list of command specific to current project. `pro l s` will change to directory 'srcs' in that project location. 
+  - connect with 'Pomo'
+  - set current task from `task project:xxx`
+    - set current task with progression with percentage
