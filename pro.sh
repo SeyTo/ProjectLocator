@@ -231,7 +231,11 @@ function opentasklist() {
     echo lastest project: $last_project
     echo task list for $last_project
     # TODO process multiple tags coming from $2
-    task project:$last_project +$2
+    if [ -z $2 ]; then
+      task project:$last_project
+    else
+      task project:$last_project +$2
+    fi
   fi
 }
 
