@@ -104,6 +104,7 @@ function updatelastproject() {
 
 function storeproject() {
   # save the last project location to ./last
+  echo setting $1 as current project.
   echo $1 > $LOC/last 
 }
 
@@ -111,6 +112,7 @@ function storeproject() {
 function getlastprojectpath() {
   # get last project's path
   # TODO change last directory to contain more info
+  # DO NOT ECHO HERE. Unless you want to return a string
   if [ -f $LOC/last ]; then
     cat $LOC/last 
   else
@@ -121,18 +123,18 @@ function getlastprojectpath() {
 
 function getlastprojectname() {
   # get last project's name from actual path format.
+  # DO NOT ECHO HERE. unless you want to return a string
   last_path=`getlastprojectpath`
-  
+
   if [[ $last_path != '' ]]; then
-    echo $last_path | sed 's/.*\///'
+    echo $last_path | sed -e "s%$PROJECTROOT/%%g" -e "s%/.*%%"
   else
     echo ''
   fi
 }
 
-
 function gotolast() {
-  # change directory to latest project.
+  # change directory to current project.
   final=$1
   sec=$2
   # jump to inner directory if there was a second argument
@@ -140,8 +142,8 @@ function gotolast() {
     final=$1/$2
   fi
   if cd $final; then
-    storeproject $1
-    echo cd to: $final
+    storeproject $1/$2
+    echo cd to: $1/$2
   else
     echo could find here
     sleep 1
@@ -179,10 +181,11 @@ function showmenu() {
       loc=`grep -P "^$opt" $LOC/projects | grep -Po "\/.*"`
     fi
     # loc=`sed -e "$opt q;d" $LOC/projects | grep -Po "\/.*"`
+    echo redy update
     gotolast $loc ${@:2} &&
+      updatelastproject $name $loc
     # cd $loc &&
     #  storeproject $loc &&
-      updatelastproject $name $loc
     
     break
   done
@@ -226,7 +229,7 @@ function opentasklist() {
   # TODO get task list for project at given number
   last_project=`getlastprojectname`
   if [ -z "$last_project" ]; then
-    echo no last project found. Ps Open a project first. 
+    echo no last project found. Open a project first. 
   else
     echo lastest project: $last_project
     echo task list for $last_project
@@ -314,7 +317,7 @@ showscriptlists() {
         elif [ -f $scriptdir/$i/$opt ]; then
           echo doing
           echo $scriptdir/$i/$opt
-          exec $scriptdir/$i/$opt &
+          . $scriptdir/$i/$opt &
           break
         else
           echo nothing
