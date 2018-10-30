@@ -138,12 +138,12 @@ function gotolast() {
   final=$1
   sec=$2
   # jump to inner directory if there was a second argument
-  if [[ $sec != 0 ]]; then
-    final=$1/$2
+  if [[ -n $sec ]]; then
+    final=$final/$sec
   fi
   if cd $final; then
-    storeproject $1/$2
-    echo cd to: $1/$2
+    storeproject $final
+    echo cd to: $final
   else
     echo could find here
     sleep 1
