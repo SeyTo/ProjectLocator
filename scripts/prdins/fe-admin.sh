@@ -1,8 +1,8 @@
 A=/a
 ROOT=$PROJECTROOT/prdins/
-ACTUAL=$ROOT/srcs/fe-common/
+ACTUAL=$ROOT/srcs/fe-admin/
 # source ~/.config/i3/vars.sh
-SESSION_LOC="~/.vim/session/prdins-fe-common.vim"
+SESSION_LOC="~/.vim/session/prdins-fe-admin.vim"
 
 # TEST
 echo $ROOT
@@ -10,12 +10,15 @@ echo $A
 
 function openEditor() {
   code
-  chromium
   # urxvtc \
   #   -cd $ACTUAL/src \
   #   -e zsh
   # the following line will open vim but <F*> commands will all be dead. Dont know why.
   # -c 'vim --servername IDE --cmd "nmap ZE :mksession! ~/.vim/session/prdins-fe-common.vim<CR>" index.js'
+}
+
+function openBrowser() {
+  chromium
 }
 
 function openServer() {
@@ -29,7 +32,7 @@ function openAPIServer() {
   urxvtc \
     -cd $ROOT/srcs/api-common/ \
     -e zsh \
-    -c 'npm run serve'
+    -c 'npm run dev'
 }
 
 function openCLIWindow() {
@@ -69,3 +72,8 @@ i3-msg 'move container to workspace 4'
 
 openEditor 
 i3-msg 'move container to workspace 2'
+
+openBrowser
+i3-msg 'move container to workspace 2'
+
+i3-msg 'workspace 2'

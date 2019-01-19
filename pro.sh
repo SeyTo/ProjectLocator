@@ -20,6 +20,8 @@ function usage {
     i             initialize a script. Helps you to start windows and other stuffs that otherwise isn't available in ProLo.
     ta            (if you have 'task' installed). Shows list of task related to it. The project name must be set to directory name.
     ta [tag]      (if you have 'task' installed). Shows list of task related to current project and tags(dont add '+' infront of tags). The project name must be set to directory name.
+    new           creates starter documents and directories based on _proj template.
+    pomo [taskno] starts the pomodoro timer for the given task id. The server must be started manually.
 EOF
   return;
 }
@@ -73,6 +75,26 @@ function outputtofilearray() {
     echo $i : $2
     # echo $i >> $2
   done
+}
+
+function createProject() {
+  if [ -z $1 ]; then
+    echo "Whats the name of project?"
+    return
+  fi
+
+  if [ ! -d $LOC/templates/_proj ]; then
+    echo "No _proj template found in ./templates. Create one." 
+    return
+  fi
+
+  if [ -z $PROJECTROOT ]; then
+    echo "Please assign PROJECTROOT variable to root of your directory."
+    return
+  fi
+
+  cp -r $LOC/templates/_proj $PROJECTROOT/$1
+  echo created $1 in $PROJECTROOT
 }
 
 
@@ -329,6 +351,12 @@ showscriptlists() {
   done
 }
 
+startpomo() {
+  local name=`getlastprojectname`
+  task project:$name list $1
+  sudo pomo start $1
+}
+
 
 # for i in `seq ${#DIRS[@]}`;
 
@@ -375,6 +403,20 @@ while [ "$1" != "" ]; do
       ;;
     create)
       showcreateprojectmenu $LOC/templates
+      ;;
+    new)
+      echo ${@:2}
+      createProject ${@:2}
+      return
+      ;;
+    pomo)
+      echo starting pomo
+      if [ ${@:2} != "" ]; then
+        startpomo ${@:2}
+        shift
+      else
+        echo need task id as second args
+      fi
       ;;
     i)
       # initialize using a script for the current project

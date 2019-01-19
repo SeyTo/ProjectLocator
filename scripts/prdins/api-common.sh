@@ -2,7 +2,7 @@ A=/a
 ROOT=$PROJECTROOT/prdins/
 ACTUAL=$ROOT/srcs/api-common/
 EXTRA=$A/js/nodejs/_repo/
-source ~/.config/i3/vars.sh
+# source ~/.config/i3/vars.sh
 SESSION_LOC="~/.vim/session/prdins-api-common.vim"
 
 # TEST
@@ -10,8 +10,10 @@ echo $ROOT
 echo $A
 
 function openEditor() {
+  # code
   urxvtc \
-    -cd /a/_proj/prdins/srcs/api-common/src \
+    -title 'EDITOR' \
+    -cd /a/_proj/prdins/srcs/api-common/lib/src \
     -e zsh
   # the following line will open vim but <F*> commands will all be dead. Dont know why.
   # -c 'vim --servername IDE --cmd "nmap ZE :mksession! ~/.vim/session/prdins-api-common.vim<CR>" index.js'
@@ -19,15 +21,15 @@ function openEditor() {
 
 function openServer() {
   urxvtc \
-    -cd /a/_proj/prdins/srcs/api-common/ \
+    -cd $ROOT/srcs/api-common \
     -e zsh \
-    -c 'npm run serve'
+    -c 'npm run dev'
 }
 
 function openCurlTestWindow() {
   urxvtc \
     -title "CURL TEST" \
-    -cd $ROOT/srcs/curl \
+    -cd $ROOT/srcs/api-common/lib/src/curl \
     -e zsh 
 }
 
@@ -64,20 +66,23 @@ function openExtra() {
     -e zsh
 }
 
-i3-msg workspace $ws1
-openExtra
-sleep 1
+# openExtra
+# i3-msg 'move container to workspace 1'
 
-i3-msg workspace $ws2
 openEditor
-sleep 1
+i3-msg 'move container to workspace 2'
 
-i3-msg workspace $ws3
-openServer
-openCurlTestWindow
-openCLIWindow
-sleep 1
-
-i3-msg workspace $ws4
 openMongoDB
+i3-msg 'move container to workspace 5'
+
+openServer
+i3-msg 'move container to workspace 3'
+
+openCurlTestWindow
+i3-msg 'move container to workspace 4'
+
+openCLIWindow
+i3-msg 'move container to workspace 3'
+
 openMongoClient
+i3-msg 'move container to workspace 4'
